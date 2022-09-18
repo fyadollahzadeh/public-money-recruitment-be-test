@@ -37,7 +37,7 @@ namespace VacationRental.Logic.Interfaces
                 {
                     Date = startDate,
                     Bookings = new (),
-                    PreparationTimes = new List<PreparationTime>()
+                    PreparationTimes = new List<PreparationTimeDto>()
                 };
                 IEnumerable<BookingEntity> bookinsOnDate = await _bookingsLogic.GetBookingsOfRentalOccupiedOnDate(rental.Id, startDate, ct);
                 calendarViewModel.Bookings.AddRange(bookinsOnDate.Select(x => new CalendarBookingViewDto

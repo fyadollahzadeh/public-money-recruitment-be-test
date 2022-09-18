@@ -331,10 +331,10 @@ namespace VacationRental.Logic.Tests
             var bookingLogic = GetBookingLogic(
                 fakeBookingsInDatabse: existingFakeBookings,
                 fakeRentalsInDatabase: new List<RentalEntity> { new RentalEntity(1) { Units = 2, PreparationTimeInDays = 3 } });
-            var expectedResult = new List<PreparationTime>() { new PreparationTime { Unit = 1 }, new PreparationTime { Unit = 2 } };
+            var expectedResult = new List<PreparationTimeDto>() { new PreparationTimeDto { Unit = 1 }, new PreparationTimeDto { Unit = 2 } };
 
             //Act
-            List<PreparationTime> preparationTimes = await bookingLogic.GetUnitsOfRentalNeedsPreparationOnDate(1, new DateOnly(2002, 1, 5), CancellationToken.None);
+            List<PreparationTimeDto> preparationTimes = await bookingLogic.GetUnitsOfRentalNeedsPreparationOnDate(1, new DateOnly(2002, 1, 5), CancellationToken.None);
 
             //Assert
             preparationTimes.Should().BeEquivalentTo(expectedResult);
