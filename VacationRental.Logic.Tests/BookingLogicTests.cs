@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using VacationRental.Infrastructure.Entities;
+using VacationRental.Infrastructure.Repositories.Interfaces;
 using VacationRental.Logic.Implementations;
 using VacationRental.Logic.Interfaces;
 using Xunit;
@@ -31,7 +33,12 @@ namespace VacationRental.Logic.Tests
 
         private IBookingLogic GetBookingLogic(List<BookingEntity>? fakeRentalsInDatabse = null)
         {
-            var bookingLogic = new BookingLogic();
+            var stubBookingRepository = new Mock<IBookingDatabaseRepository>();
+            stubBookingRepository.Setup(x => x.GetAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((int id, CancellationToken ct) => fakeRentalsInDatabse?.FirstOrDefault(X => X.Id == id));
+            stubBookingRepository.Setup(x => x.AddAsync(It.IsAny<BookingEntity>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(1);
+            var bookingLogic = new BookingLogic(stubBookingRepository.Object);
 
             return bookingLogic;
         }
