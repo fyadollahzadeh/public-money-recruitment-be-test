@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using VacationRental.Infrastructure.Entities;
 using VacationRental.Infrastructure.Exceptions;
 using VacationRental.Infrastructure.Repositories.Interfaces;
+using VacationRental.Logic.DTOs;
 using VacationRental.Logic.Implementations;
 using VacationRental.Logic.Interfaces;
 using Xunit;
@@ -21,7 +22,7 @@ namespace VacationRental.Logic.Tests
         public async void GetBooking_ValidId_ShouldReturnBookingModel()
         {
             //Arrange
-            var givenData = new BookingEntity { Id = 1, RentalId = 1, Nights = 1, Start = new DateTime(2002, 1, 1) };
+            var givenData = new BookingEntity { Id = 1, RentalId = 1, Nights = 1, Start = new DateOnly(2002, 1, 1) };
             IBookingLogic bookingLogic = GetBookingLogic(new List<BookingEntity> { givenData });
 
             //Act
@@ -35,7 +36,7 @@ namespace VacationRental.Logic.Tests
         public async void GetBooking_NotExistingId_ShouldThrowExcpetion()
         {
             //Arrange
-            var givenData = new BookingEntity { Id = 1, RentalId = 1, Nights = 1, Start = new DateTime(2002, 1, 1) };
+            var givenData = new BookingEntity { Id = 1, RentalId = 1, Nights = 1, Start = new DateOnly(2002, 1, 1) };
             IBookingLogic bookingLogic = GetBookingLogic(new List<BookingEntity> { givenData });
 
             //Act
@@ -45,6 +46,20 @@ namespace VacationRental.Logic.Tests
             await action.Should().ThrowAsync<EntityNotFoundException>();
         }
 
+        [Fact]
+        public async void AddBooking_NoOverlap_ShouldReturnId()
+        {
+            //Arrange
+            var givenData = new BookingCreationDto { RentalId = 1, Nights = 1, Start = new DateOnly(2002, 1, 1) };
+            var bookingLogic = GetBookingLogic();
+
+            //Act
+            int addedItemId = await bookingLogic.AddBookingAsync(givenData, CancellationToken.None);
+
+            //Assert
+            addedItemId.Should().Be(1);
+
+        }
 
         private IBookingLogic GetBookingLogic(List<BookingEntity>? fakeBookingsInDatabse = null)
         {

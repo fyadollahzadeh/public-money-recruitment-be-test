@@ -6,5 +6,6 @@ namespace VacationRental.Logic.Interfaces
     public interface IBookingLogic
     {
         Task<BookingEntity> GetBookingAsync(int bookingId, CancellationToken ct);
+        Task<int> AddBookingAsync(BookingCreationDto bookingEntity, CancellationToken ct);
     }
 }

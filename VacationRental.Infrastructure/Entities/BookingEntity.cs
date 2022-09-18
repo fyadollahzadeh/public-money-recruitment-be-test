@@ -13,15 +13,11 @@
         {
         }
 
-        public DateTime Start
-        {
-            get => _startIgnoreTime;
-            set => _startIgnoreTime = value.Date;
-        }
+        public DateOnly Start { set; get; }
 
         public int Nights { get; set; }
 
-        public DateTime EndDate
+        public DateOnly EndDate
         {
             get => Start.AddDays(Nights);
         }
