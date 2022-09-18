@@ -148,7 +148,7 @@ namespace VacationRental.Logic.Tests
         }
 
         [Fact]
-        public async void UpdateRental_UpdateUnits_HasOverlap_ShouldReturnId()
+        public async void UpdateRental_NoOverlap_ShouldReturnId()
         {
             //Arrange
 
@@ -174,10 +174,11 @@ namespace VacationRental.Logic.Tests
             IRentalLogic rentalLogic = GetRentalLogic(fakeRentalsInDatabse,fakeBookingsInDatabse: fakeBookingsInDatabse);
 
             //Act
-            var updatedItemId = await rentalLogic.UpdateRentalAsync(new RentalUpdateDto { Id = 1, PreparationTimeInDays = 1, Units = 3 }, CancellationToken.None);
+            var givenData = new RentalUpdateDto { Id = 1, PreparationTimeInDays = 2, Units = 3 };
+            var updatedItem = await rentalLogic.UpdateRentalAsync(givenData, CancellationToken.None);
 
             //Assert
-            updatedItemId.Should().Be(1);
+            updatedItem.Should().BeEquivalentTo(givenData);
 
         }
 
@@ -189,7 +190,7 @@ namespace VacationRental.Logic.Tests
             stubRentalRepository.Setup(x => x.AddAsync(It.IsAny<RentalEntity>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(1);
             stubRentalRepository.Setup(x => x.UpdateAsync(It.IsAny<RentalEntity>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(1);
+                .ReturnsAsync((RentalEntity x,CancellationToken ct)=>x);
 
 
             var stubBookingRepository = new Mock<IBookingDatabaseRepository>();

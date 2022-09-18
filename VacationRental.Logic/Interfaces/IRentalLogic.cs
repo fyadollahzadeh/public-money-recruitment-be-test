@@ -8,6 +8,6 @@ namespace VacationRental.Logic.Interfaces
         Task<int> AddRentalAsync(RentalCreationDto model, CancellationToken ct);
         Task<RentalEntity> GetRentalAsync(int rentalId, CancellationToken ct);
 
-        Task<int> UpdateRentalAsync(RentalUpdateDto rentalEntity, CancellationToken none);
+        Task<RentalEntity> UpdateRentalAsync(RentalUpdateDto rentalEntity, CancellationToken none);
     }
 }

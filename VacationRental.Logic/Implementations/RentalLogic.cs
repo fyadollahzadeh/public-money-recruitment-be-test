@@ -30,16 +30,16 @@ namespace VacationRental.Logic.Implementations
             return item;
         }
 
-        public async Task<int> UpdateRentalAsync(RentalUpdateDto rentalUpdateDto, CancellationToken ct)
+        public async Task<RentalEntity> UpdateRentalAsync(RentalUpdateDto rentalUpdateDto, CancellationToken ct)
         {
             var rentalEntity = await GetRentalAsync(rentalUpdateDto.Id,ct);
 
             var doesOverlap = await doesOverlapHappens();
             if (doesOverlap) throw new NotUpdatableException("can not update, due to existing bookings");
 
-            var updatedItemId = await _rentalDatabaseRepository.UpdateAsync(rentalUpdateDto.Adapt<RentalEntity>(), ct);
+            var updatedItem = await _rentalDatabaseRepository.UpdateAsync(rentalUpdateDto.Adapt<RentalEntity>(), ct);
 
-            return updatedItemId;
+            return updatedItem;
             async Task<bool> doesOverlapHappens()
             {
                 var bookingsOfRental = await _bookingDatabaseRepository.GetAllAsync(x => x.RentalId == rentalEntity.Id, ct);
