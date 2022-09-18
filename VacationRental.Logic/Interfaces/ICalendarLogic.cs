@@ -45,6 +45,7 @@ namespace VacationRental.Logic.Interfaces
                     Id = x.Id,
                     Unit = x.Id
                 }));
+                calendarViewModel.PreparationTimes.AddRange(await _bookingsLogic.GetUnitsOfRentalNeedsPreparationOnDate(rental.Id, startDate, ct));
                 result.Dates.Add(calendarViewModel);
             }
 
