@@ -35,7 +35,7 @@ namespace VacationRental.Logic.Tests
         }
 
         [Fact]
-        public async void GetRental_NotExistingId_ShouldReturnRentalModel()
+        public async void GetRental_NotExistingId_ShouldThrowExcpetion()
         {
             //Arrange
             var fakeRentalsInDatabse = new List<RentalEntity> { new RentalEntity(1) { Units = 1, PreparationTimeInDays = 1 } };
