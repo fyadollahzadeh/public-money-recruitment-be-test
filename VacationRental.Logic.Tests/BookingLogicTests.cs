@@ -51,7 +51,7 @@ namespace VacationRental.Logic.Tests
         {
             //Arrange
             var givenData = new BookingCreationDto { RentalId = 1, Nights = 1, Start = new DateOnly(2002, 1, 1) };
-            var bookingLogic = GetBookingLogic(fakeRentalsInDatabase: new List<RentalEntity> { new RentalEntity(1) { Units = 1, PreparationTimeInDays = 1 } });
+            var bookingLogic = GetBookingLogic(fakeRentalsInDatabase: new List<RentalEntity> { new RentalEntity(1) { Units = 1, PreparationTimeInDays = 0 } });
 
             //Act
             int addedItemId = await bookingLogic.AddBookingAsync(givenData, CancellationToken.None);
@@ -168,6 +168,57 @@ namespace VacationRental.Logic.Tests
 
             //Assert
             await action.Should().ThrowAsync<NotAvailableForBookingException>();
+        }
+
+
+        [Fact]
+        public async void AddBooking_RentalPreparationDaysAddsOverlapping_OfType_StartsAfterEndsAfter_ShouldThrowException()
+        {
+            //Arrange
+            var existingFakeBookings = new List<BookingEntity>()
+            {
+                new BookingEntity
+                {
+                    RentalId = 1,
+                    Start = new DateOnly(2002, 1, 4),
+                    Nights = 2
+                }
+            };
+            var givenData = new BookingCreationDto { RentalId = 1, Nights = 3, Start = new DateOnly(2002, 1, 1) };
+            IBookingLogic bookingLogic = GetBookingLogic(fakeRentalsInDatabase: new List<RentalEntity> { new RentalEntity(1) { Units = 1, PreparationTimeInDays = 1 } }, fakeBookingsInDatabse: existingFakeBookings);
+
+            //Act
+            var action = async () => await bookingLogic.AddBookingAsync(givenData, CancellationToken.None);
+
+            //Assert
+            await action.Should().ThrowAsync<NotAvailableForBookingException>();
+        }
+
+
+        [Fact]
+        public async void AddBooking_WithPreparationDays_NoOverlap_ShouldReturnId()
+        {
+            //Arrange
+            var existingFakeBookings = new List<BookingEntity>()
+            {
+                new BookingEntity
+                {
+                    RentalId = 1,
+                    Start = new DateOnly(2002, 1, 1),
+                    Nights = 2
+                }
+            };
+            var givenData = new BookingCreationDto { RentalId = 1, Nights = 1, Start = new DateOnly(2002, 1, 4) };
+            var bookingLogic = GetBookingLogic(
+                fakeBookingsInDatabse: existingFakeBookings,
+                fakeRentalsInDatabase: new List<RentalEntity> { new RentalEntity(1) { Units = 1, PreparationTimeInDays = 1 } });
+
+            //Act
+            int addedItemId = await bookingLogic.AddBookingAsync(givenData, CancellationToken.None);
+
+            //Assert
+            addedItemId.Should().Be(1);
+
         }
 
         private IBookingLogic GetBookingLogic(List<RentalEntity>? fakeRentalsInDatabase=null,List<BookingEntity>? fakeBookingsInDatabse = null)
