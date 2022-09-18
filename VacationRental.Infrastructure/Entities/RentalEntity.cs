@@ -17,5 +17,6 @@ namespace VacationRental.Infrastructure.Entities
         }
 
         public int Units { get; set; }
+        public int PreparationTimeInDays { set; get; }
     }
 }

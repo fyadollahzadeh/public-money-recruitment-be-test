@@ -23,7 +23,7 @@ namespace VacationRental.Logic.Tests
         public async void GetRental_ValidId_ShouldReturnRentalModel()
         {
             //Arrange
-            var givenRental = new RentalEntity(1) { Units = 1 };
+            var givenRental = new RentalEntity(1) { Units = 1, PreparationTimeInDays = 1 };
             var fakeRentalsInDatabse = new List<RentalEntity> { givenRental };
             IRentalLogic rentalLogic = GetRentalLogic(fakeRentalsInDatabse);
 
@@ -38,7 +38,7 @@ namespace VacationRental.Logic.Tests
         public async void GetRental_NotExistingId_ShouldReturnRentalModel()
         {
             //Arrange
-            var fakeRentalsInDatabse = new List<RentalEntity> { new RentalEntity(1) { Units = 1 } };
+            var fakeRentalsInDatabse = new List<RentalEntity> { new RentalEntity(1) { Units = 1, PreparationTimeInDays = 1 } };
             IRentalLogic rentalLogic = GetRentalLogic(fakeRentalsInDatabse);
 
             //Act
@@ -53,7 +53,7 @@ namespace VacationRental.Logic.Tests
         {
             //Arrange
             IRentalLogic rentalLogic = GetRentalLogic();
-            var givenRental = new RentalCreationDto { Units = 1 };
+            var givenRental = new RentalCreationDto { Units = 1,PreparationTimeInDays = 1 };
 
             //Act
             var rentalId = await rentalLogic.AddRentalAsync(givenRental, CancellationToken.None);

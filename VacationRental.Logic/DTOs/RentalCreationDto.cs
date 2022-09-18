@@ -9,5 +9,6 @@ namespace VacationRental.Logic.DTOs
     public class RentalCreationDto
     {
         public int Units { get; set; }
+        public int PreparationTimeInDays { set; get; }
     }
 }
