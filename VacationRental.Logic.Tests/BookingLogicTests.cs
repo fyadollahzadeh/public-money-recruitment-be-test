@@ -122,6 +122,32 @@ namespace VacationRental.Logic.Tests
             //Assert
             await action.Should().ThrowAsync<NotAvailableForBookingException>();
         }
+
+
+
+        [Fact]
+        public async void AddBooking_NoPreparationDays_HasOverlap_OfType_StartsAfterEndsBefore_ShouldThrowException()
+        {
+            //Arrange
+            var existingFakeBookings = new List<BookingEntity>()
+            {
+                new BookingEntity
+                {
+                    RentalId = 1,
+                    Start = new DateOnly(2002, 1, 3),
+                    Nights = 4
+                }
+            };
+            var givenData = new BookingCreationDto { RentalId = 1, Nights = 2, Start = new DateOnly(2002, 1, 4) };
+            IBookingLogic bookingLogic = GetBookingLogic(fakeRentalsInDatabase: new List<RentalEntity> { new RentalEntity(1) { Units = 1, PreparationTimeInDays = 0 } }, fakeBookingsInDatabse: existingFakeBookings);
+
+            //Act
+            var action = async () => await bookingLogic.AddBookingAsync(givenData, CancellationToken.None);
+
+            //Assert
+            await action.Should().ThrowAsync<NotAvailableForBookingException>();
+        }
+
         private IBookingLogic GetBookingLogic(List<RentalEntity>? fakeRentalsInDatabase=null,List<BookingEntity>? fakeBookingsInDatabse = null)
         {
 
