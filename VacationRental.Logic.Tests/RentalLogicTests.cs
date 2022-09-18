@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using VacationRental.Infrastructure.Entities;
+using VacationRental.Infrastructure.Exceptions;
 using VacationRental.Infrastructure.Repositories.Interfaces;
 using VacationRental.Logic.Implementations;
 using VacationRental.Logic.Interfaces;
@@ -32,11 +33,24 @@ namespace VacationRental.Logic.Tests
             rental.Should().BeEquivalentTo(givenRental);
         }
 
+        [Fact]
+        public async void GetRental_NotExistingId_ShouldReturnRentalModel()
+        {
+            //Arrange
+            var fakeRentalsInDatabse = new List<RentalEntity> { new RentalEntity(1) { Units = 1 } };
+            IRentalLogic rentalLogic = GetRentalLogic(fakeRentalsInDatabse);
+
+            //Act
+            var action = async()=>await rentalLogic.GetRentalAsync(2, CancellationToken.None);
+
+            //Assert
+            await action.Should().ThrowAsync<EntityNotFoundException>();
+        }
         private IRentalLogic GetRentalLogic(List<RentalEntity> fakeRentalsInDatabse)
         {
             var stubRentalRepository = new Mock<IRentalDatabaseRepository>();
             stubRentalRepository.Setup(x => x.GetAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((int id, CancellationToken ct) => fakeRentalsInDatabse.First(X => X.Id == id));
+                .ReturnsAsync((int id, CancellationToken ct) => fakeRentalsInDatabse.FirstOrDefault(X => X.Id == id));
             var rentalLogic = new RentalLogic(stubRentalRepository.Object);
 
             return rentalLogic;

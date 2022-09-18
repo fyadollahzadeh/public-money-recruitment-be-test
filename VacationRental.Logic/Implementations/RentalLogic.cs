@@ -1,4 +1,5 @@
 ﻿using VacationRental.Infrastructure.Entities;
+using VacationRental.Infrastructure.Exceptions;
 using VacationRental.Infrastructure.Repositories.Interfaces;
 using VacationRental.Logic.DTOs;
 using VacationRental.Logic.Interfaces;
@@ -19,7 +20,10 @@ namespace VacationRental.Logic.Implementations
 
         public async Task<RentalEntity> GetRentalAsync(int rentalId, CancellationToken ct)
         {
-            return await _rentalDatabaseRepository.GetAsync(rentalId,ct);
+            var item =  await _rentalDatabaseRepository.GetAsync(rentalId,ct);
+            if (item == null) throw new EntityNotFoundException();
+
+            return item;
         }
     }
 }
