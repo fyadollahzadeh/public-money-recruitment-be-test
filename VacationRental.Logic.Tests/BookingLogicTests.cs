@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using VacationRental.Infrastructure.Entities;
+using VacationRental.Infrastructure.Exceptions;
 using VacationRental.Infrastructure.Repositories.Interfaces;
 using VacationRental.Logic.Implementations;
 using VacationRental.Logic.Interfaces;
@@ -28,6 +29,20 @@ namespace VacationRental.Logic.Tests
 
             //Assert
             bookingEntity.Should().BeEquivalentTo(givenData);
+        }
+
+        [Fact]
+        public async void GetBooking_NotExistingId_ShouldThrowExcpetion()
+        {
+            //Arrange
+            var givenData = new BookingEntity { Id = 1, RentalId = 1, Nights = 1, Start = new DateTime(2002, 1, 1) };
+            IBookingLogic bookingLogic = GetBookingLogic(new List<BookingEntity> { givenData });
+
+            //Act
+            var action =async ()=> await bookingLogic.GetBookingAsync(2, CancellationToken.None);
+
+            //Assert
+            await action.Should().ThrowAsync<EntityNotFoundException>();
         }
 
 

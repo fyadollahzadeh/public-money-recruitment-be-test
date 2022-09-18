@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VacationRental.Infrastructure.Entities;
+using VacationRental.Infrastructure.Exceptions;
 using VacationRental.Infrastructure.Repositories.Interfaces;
 using VacationRental.Logic.Interfaces;
 
@@ -19,6 +20,7 @@ namespace VacationRental.Logic.Implementations
         public async Task<BookingEntity> GetBookingAsync(int bookingId, CancellationToken ct)
         {
             var item = await _bookingDatabaseRepository.GetAsync(bookingId, ct);
+            if (item == null) throw new EntityNotFoundException();
             return item;
         }
     }
