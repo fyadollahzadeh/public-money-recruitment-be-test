@@ -37,7 +37,7 @@ namespace VacationRental.Logic.Implementations
             var doesOverlap = await doesOverlapHappens();
             if (doesOverlap) throw new NotUpdatableException("can not update, due to existing bookings");
 
-            var updatedItemId = await _rentalDatabaseRepository.UpdateAsync(rentalEntity, ct);
+            var updatedItemId = await _rentalDatabaseRepository.UpdateAsync(rentalUpdateDto.Adapt<RentalEntity>(), ct);
 
             return updatedItemId;
             async Task<bool> doesOverlapHappens()
