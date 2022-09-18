@@ -58,7 +58,7 @@ namespace VacationRental.Api
         public static IServiceCollection AddDatabaseServices(this IServiceCollection services)
         {
             services.AddSingleton<IDictionary<int, RentalEntity>>(new Dictionary<int, RentalEntity>());
-            services.AddSingleton<IDictionary<int, BookingViewModel>>(new Dictionary<int, BookingViewModel>());
+            services.AddSingleton<IDictionary<int, BookingEntity>>(new Dictionary<int, BookingEntity>());
             services.AddSingleton<IRentalDatabaseRepository, RentalDatabaseRepository>();
             services.AddSingleton<IBookingDatabaseRepository, BookingDatabaseRepository>();
             return services;

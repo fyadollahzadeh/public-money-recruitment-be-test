@@ -10,19 +10,28 @@ namespace VacationRental.Infrastructure.Repositories.Implementations
 {
     public class BookingDatabaseRepository : IBookingDatabaseRepository
     {
+        Dictionary<int, BookingEntity> _bookings;
+        public BookingDatabaseRepository(IDictionary<int, BookingEntity> bookings)
+        {
+            _bookings = (Dictionary<int, BookingEntity>)bookings;
+        }
         public Task<int> AddAsync(BookingEntity item, CancellationToken ct)
         {
-            throw new NotImplementedException();
+            var itemId = _bookings.Keys.Count + 1;
+            item.Id = itemId;
+            _bookings.Add(itemId, item);
+            return Task.FromResult(itemId);
         }
 
-        public Task<IEnumerable<BookingEntity>> GetAllAsync(Func<BookingEntity, bool> searchQuery, CancellationToken ct)
+        public async Task<IEnumerable<BookingEntity>> GetAllAsync(Func<BookingEntity, bool> searchQuery, CancellationToken ct)
         {
-            throw new NotImplementedException();
+            var items = _bookings.Values.Where(searchQuery);
+            return items;
         }
 
-        public Task<BookingEntity> GetAsync(int itemId, CancellationToken ct)
+        public async Task<BookingEntity?> GetAsync(int rentalId, CancellationToken ct)
         {
-            throw new NotImplementedException();
+            return _bookings.GetValueOrDefault(rentalId);
         }
 
         public Task<BookingEntity> UpdateAsync(BookingEntity item, CancellationToken ct)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FluentValidation;
+using System;
 
 namespace VacationRental.Api.Models
 {
@@ -14,5 +15,13 @@ namespace VacationRental.Api.Models
 
         private DateTime _startIgnoreTime;
         public int Nights { get; set; }
+    }
+    public class BookingBindingModelValidator : AbstractValidator<BookingBindingModel>
+    {
+        public BookingBindingModelValidator()
+        {
+
+            RuleFor(x => x.Nights).GreaterThan(0);
+        }
     }
 }
