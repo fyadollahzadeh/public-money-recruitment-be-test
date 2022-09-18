@@ -21,5 +21,9 @@
 
         public int Nights { get; set; }
 
+        public DateTime EndDate
+        {
+            get => Start.AddDays(Nights);
+        }
     }
 }
