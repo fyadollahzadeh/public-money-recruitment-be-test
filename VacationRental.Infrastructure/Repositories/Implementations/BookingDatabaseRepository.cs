@@ -24,5 +24,10 @@ namespace VacationRental.Infrastructure.Repositories.Implementations
         {
             throw new NotImplementedException();
         }
+
+        public Task<int> UpdateAsync(BookingEntity item, CancellationToken ct)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

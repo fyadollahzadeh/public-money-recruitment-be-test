@@ -10,9 +10,11 @@ namespace VacationRental.Logic.Implementations
     public class RentalLogic : IRentalLogic
     {
         IRentalDatabaseRepository _rentalDatabaseRepository;
-        public RentalLogic(IRentalDatabaseRepository rentalDatabaseRepository)
+        IBookingDatabaseRepository _bookingDatabaseRepository;
+        public RentalLogic(IRentalDatabaseRepository rentalDatabaseRepository,IBookingDatabaseRepository bookingDatabaseRepository)
         {
             _rentalDatabaseRepository = rentalDatabaseRepository;
+            _bookingDatabaseRepository = bookingDatabaseRepository;
         }
         public async Task<int> AddRentalAsync(RentalCreationDto model, CancellationToken ct)
         {
@@ -26,6 +28,31 @@ namespace VacationRental.Logic.Implementations
             if (item == null) throw new EntityNotFoundException();
 
             return item;
+        }
+
+        public async Task<int> UpdateRentalAsync(RentalEntity rentalEntity, CancellationToken ct)
+        {
+            var doesOverlap = await doesOverlapHappens();
+            if (doesOverlap) throw new NotUpdatableException("can not update, due to existing bookings");
+
+            var updatedItemId = await _rentalDatabaseRepository.UpdateAsync(rentalEntity, ct);
+
+            return updatedItemId;
+            async Task<bool> doesOverlapHappens()
+            {
+                var bookingsOfRental = await _bookingDatabaseRepository.GetAllAsync(x => x.RentalId == rentalEntity.Id, ct);
+                foreach (var booking in bookingsOfRental)
+                {
+                    var overlappingBookings = await _bookingDatabaseRepository.GetAllAsync(otherBooking => otherBooking.Id != booking.Id && otherBooking.RentalId == booking.RentalId && booking.EndDate.AddDays(rentalEntity.PreparationTimeInDays) > otherBooking.Start, ct);
+                    int overlapCounts = overlappingBookings.Count();
+                    if (overlapCounts >= rentalEntity.Units)
+                    {
+                        return true;
+                    }
+
+                }
+                return false;
+            }
         }
     }
 }

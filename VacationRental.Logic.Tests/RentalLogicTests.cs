@@ -63,14 +63,57 @@ namespace VacationRental.Logic.Tests
 
         }
 
-        private IRentalLogic GetRentalLogic(List<RentalEntity>? fakeRentalsInDatabse = null)
+        [Fact]
+        public async void UpdateRental_UpdatePreparationTime_HasOverlap_ShouldThrowException()
+        {
+            //Arrange
+
+            var fakeBookingsInDatabse = new List<BookingEntity>()
+            {
+
+                new BookingEntity
+                {
+                    Id = 1,
+                    RentalId = 1,
+                    Start = new DateOnly(2002, 1, 1),
+                    Nights = 1
+                },
+                new BookingEntity
+                {
+                    Id = 2,
+                    RentalId = 1,
+                    Start = new DateOnly(2002, 1, 3),
+                    Nights = 3
+                }
+            };
+            IRentalLogic rentalLogic = GetRentalLogic(fakeBookingsInDatabse : fakeBookingsInDatabse);
+
+            //Act
+            var action = async () => await rentalLogic.UpdateRentalAsync(new RentalEntity { Id = 1, PreparationTimeInDays = 2, Units = 1 }, CancellationToken.None);
+
+            //Assert
+            await action.Should().ThrowAsync<NotUpdatableException>();
+
+        }
+
+        private IRentalLogic GetRentalLogic(List<RentalEntity>? fakeRentalsInDatabse = null, List<BookingEntity>? fakeBookingsInDatabse = null)
         {
             var stubRentalRepository = new Mock<IRentalDatabaseRepository>();
             stubRentalRepository.Setup(x => x.GetAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((int id, CancellationToken ct) => fakeRentalsInDatabse?.FirstOrDefault(X => X.Id == id));
             stubRentalRepository.Setup(x => x.AddAsync(It.IsAny<RentalEntity>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(1);
-            var rentalLogic = new RentalLogic(stubRentalRepository.Object);
+
+            var stubBookingRepository = new Mock<IBookingDatabaseRepository>();
+            stubBookingRepository
+                .Setup(x => x.GetAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((int id, CancellationToken ct) => fakeBookingsInDatabse?.FirstOrDefault(X => X.Id == id));
+            stubBookingRepository
+                .Setup(x => x.GetAllAsync(It.IsAny<Func<BookingEntity, bool>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((Func<BookingEntity, bool> func, CancellationToken ct) => fakeBookingsInDatabse?.Where(func));
+            stubBookingRepository.Setup(x => x.AddAsync(It.IsAny<BookingEntity>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(1);
+            var rentalLogic = new RentalLogic(stubRentalRepository.Object, stubBookingRepository.Object);
 
             return rentalLogic;
         }
