@@ -285,7 +285,7 @@ namespace VacationRental.Logic.Tests
 
 
         [Fact]
-        public async void GetBookingsOccupiedOnDate_ThereAre2UnitsThatNeedPreparation_ShouldReturn2PreparationItems()
+        public async void GetUnitsOfRentalNeedsPreparationOnDate_ThereAre2UnitsThatNeedPreparation_ShouldReturn2PreparationItems()
         {
             //Arrange
 
