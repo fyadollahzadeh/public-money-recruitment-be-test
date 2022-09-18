@@ -15,6 +15,11 @@ namespace VacationRental.Infrastructure.Repositories.Implementations
             throw new NotImplementedException();
         }
 
+        public Task<IEnumerable<RentalEntity>> GetAllAsync(Func<RentalEntity, bool> searchQuery, CancellationToken ct)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<RentalEntity> GetAsync(int itemId, CancellationToken ct)
         {
             throw new NotImplementedException();

@@ -11,5 +11,7 @@ namespace VacationRental.Infrastructure.Repositories.Interfaces
     {
         Task<int> AddAsync(T item, CancellationToken ct);
         Task<T> GetAsync(TKey itemId, CancellationToken ct);
+
+        Task<IEnumerable<T>> GetAllAsync(Func<T, bool> searchQuery, CancellationToken ct);
     }
 }

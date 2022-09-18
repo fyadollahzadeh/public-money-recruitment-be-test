@@ -27,8 +27,23 @@ namespace VacationRental.Logic.Implementations
             var rental = await _rentalDatabaseRepository.GetAsync(bookingEntity.RentalId, ct);
             if (rental == null) throw new RentalNotFoundException();
 
-            var addedItemId = await _bookingDatabaseRepository.AddAsync(bookingEntity.Adapt<BookingEntity>(),ct);
+
+            var model = bookingEntity.Adapt<BookingEntity>();
+            Func<BookingEntity, bool> findOverlappingBookingsOfRentalQuery = booking => booking.RentalId == bookingEntity.RentalId && DoesBookingsOverlap(model, booking, rental.PreparationTimeInDays);
+            IEnumerable<BookingEntity> overlappingBookings = await _bookingDatabaseRepository.GetAllAsync(findOverlappingBookingsOfRentalQuery, ct);
+            if (overlappingBookings.Count() >= rental.Units)
+                throw new NotAvailableForBookingException("Not available");
+
+
+
+            var addedItemId = await _bookingDatabaseRepository.AddAsync(model,ct);
             return addedItemId;
+
+
+            bool DoesBookingsOverlap(BookingEntity firstBooking, BookingEntity secondBooking, int preparationDays)
+            {
+                return ((secondBooking.Start < firstBooking.Start && secondBooking.EndDate.AddDays(preparationDays) > firstBooking.Start) || (firstBooking.Start < secondBooking.Start && firstBooking.EndDate.AddDays(preparationDays) > secondBooking.Start));
+            }
         }
 
         public async Task<BookingEntity> GetBookingAsync(int bookingId, CancellationToken ct)
