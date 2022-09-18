@@ -1,6 +1,7 @@
 ﻿using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using VacationRental.Api.Models;
+using VacationRental.Logic.DTOs;
 using VacationRental.Logic.Interfaces;
 
 namespace VacationRental.Api.Controllers
@@ -32,6 +33,20 @@ namespace VacationRental.Api.Controllers
             {
                 Id = addedItem,
                 Units = model.Units
+            };
+        }
+
+        [HttpPut("{rentalId:int}")]
+        public async Task<ResourceIdViewModel> Put(int rentalId, RentalBindingModel model, CancellationToken ct)
+        {
+            var rentalUpdateDto = model.Adapt<RentalUpdateDto>();
+            rentalUpdateDto.Id = rentalId;
+
+            var updatedItem = await _rentalLogic.UpdateRentalAsync(rentalUpdateDto, ct);
+
+            return new ResourceIdViewModel
+            {
+                Id = updatedItem.Id
             };
         }
     }
