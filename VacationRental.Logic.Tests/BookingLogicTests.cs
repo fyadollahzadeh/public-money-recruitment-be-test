@@ -282,6 +282,20 @@ namespace VacationRental.Logic.Tests
             bookings.Should().BeEquivalentTo(existingFakeBookings);
         }
 
+        [Fact]
+        public async void GetUnitsOfRentalNeedsPreparationOnDate_NotExistingId_ShouldThrowException()
+        {
+            //Arrange
+
+            var bookingLogic = GetBookingLogic(
+                fakeRentalsInDatabase: new List<RentalEntity> { new RentalEntity(1) { Units = 2, PreparationTimeInDays = 3 } });
+
+            //Act
+            var action =async()=> await bookingLogic.GetUnitsOfRentalNeedsPreparationOnDate(2, new DateOnly(2002, 1, 5), CancellationToken.None);
+
+            //Assert
+            await action.Should().ThrowAsync<RentalNotFoundException>();
+        }
 
 
         [Fact]
