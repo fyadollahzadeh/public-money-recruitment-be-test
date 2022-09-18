@@ -96,6 +96,72 @@ namespace VacationRental.Logic.Tests
 
         }
 
+        [Fact]
+        public async void UpdateRental_UpdateUnits_HasOverlap_ShouldThrowException()
+        {
+            //Arrange
+
+            var fakeBookingsInDatabse = new List<BookingEntity>()
+            {
+
+                new BookingEntity
+                {
+                    Id = 1,
+                    RentalId = 1,
+                    Start = new DateOnly(2002, 1, 1),
+                    Nights = 1
+                },
+                new BookingEntity
+                {
+                    Id = 2,
+                    RentalId = 1,
+                    Start = new DateOnly(2002, 1, 3),
+                    Nights = 3
+                }
+            };
+            IRentalLogic rentalLogic = GetRentalLogic(fakeBookingsInDatabse: fakeBookingsInDatabse);
+
+            //Act
+            var action = async () => await rentalLogic.UpdateRentalAsync(new RentalEntity { Id = 1, PreparationTimeInDays = 1, Units = 1 }, CancellationToken.None);
+
+            //Assert
+            await action.Should().ThrowAsync<NotUpdatableException>();
+
+        }
+
+        [Fact]
+        public async void UpdateRental_UpdateUnits_HasOverlap_ShouldReturnId()
+        {
+            //Arrange
+
+            var fakeBookingsInDatabse = new List<BookingEntity>()
+            {
+
+                new BookingEntity
+                {
+                    Id = 1,
+                    RentalId = 1,
+                    Start = new DateOnly(2002, 1, 1),
+                    Nights = 1
+                },
+                new BookingEntity
+                {
+                    Id = 2,
+                    RentalId = 1,
+                    Start = new DateOnly(2002, 1, 3),
+                    Nights = 3
+                }
+            };
+            IRentalLogic rentalLogic = GetRentalLogic(fakeBookingsInDatabse: fakeBookingsInDatabse);
+
+            //Act
+            var updatedItemId = await rentalLogic.UpdateRentalAsync(new RentalEntity { Id = 1, PreparationTimeInDays = 1, Units = 3 }, CancellationToken.None);
+
+            //Assert
+            updatedItemId.Should().Be(1);
+
+        }
+
         private IRentalLogic GetRentalLogic(List<RentalEntity>? fakeRentalsInDatabse = null, List<BookingEntity>? fakeBookingsInDatabse = null)
         {
             var stubRentalRepository = new Mock<IRentalDatabaseRepository>();
@@ -103,6 +169,9 @@ namespace VacationRental.Logic.Tests
                 .ReturnsAsync((int id, CancellationToken ct) => fakeRentalsInDatabse?.FirstOrDefault(X => X.Id == id));
             stubRentalRepository.Setup(x => x.AddAsync(It.IsAny<RentalEntity>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(1);
+            stubRentalRepository.Setup(x => x.UpdateAsync(It.IsAny<RentalEntity>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(1);
+
 
             var stubBookingRepository = new Mock<IBookingDatabaseRepository>();
             stubBookingRepository
