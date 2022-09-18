@@ -1,11 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28803.352
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32407.343
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VacationRental.Api", "VacationRental.Api\VacationRental.Api.csproj", "{478C6CBF-6F84-4604-8E31-DEDFDFE10DBC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VacationRental.Api.Tests", "VacationRental.Api.Tests\VacationRental.Api.Tests.csproj", "{57FE6E13-7144-459F-BCA8-431087D3DAEE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VacationRental.Logic", "VacationRental.Logic\VacationRental.Logic.csproj", "{026BD19A-8B79-4846-8177-D5752AB377D1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VacationRental.Infrastructure", "VacationRental.Infrastructure\VacationRental.Infrastructure.csproj", "{E2236221-5433-4BB0-83B7-91EC7B011352}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3C367FF9-4780-474F-9697-5B8E98A629C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VacationRental.Logic.Tests", "VacationRental.Logic.Tests\VacationRental.Logic.Tests.csproj", "{1832C86F-F7EF-4969-A54D-CC0747C66637}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,9 +29,25 @@ Global
 		{57FE6E13-7144-459F-BCA8-431087D3DAEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57FE6E13-7144-459F-BCA8-431087D3DAEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57FE6E13-7144-459F-BCA8-431087D3DAEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{026BD19A-8B79-4846-8177-D5752AB377D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{026BD19A-8B79-4846-8177-D5752AB377D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{026BD19A-8B79-4846-8177-D5752AB377D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{026BD19A-8B79-4846-8177-D5752AB377D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2236221-5433-4BB0-83B7-91EC7B011352}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2236221-5433-4BB0-83B7-91EC7B011352}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2236221-5433-4BB0-83B7-91EC7B011352}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2236221-5433-4BB0-83B7-91EC7B011352}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1832C86F-F7EF-4969-A54D-CC0747C66637}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1832C86F-F7EF-4969-A54D-CC0747C66637}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1832C86F-F7EF-4969-A54D-CC0747C66637}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1832C86F-F7EF-4969-A54D-CC0747C66637}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{57FE6E13-7144-459F-BCA8-431087D3DAEE} = {3C367FF9-4780-474F-9697-5B8E98A629C1}
+		{1832C86F-F7EF-4969-A54D-CC0747C66637} = {3C367FF9-4780-474F-9697-5B8E98A629C1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6A5319C5-4F21-41BF-B8A7-BC45868FEC89}

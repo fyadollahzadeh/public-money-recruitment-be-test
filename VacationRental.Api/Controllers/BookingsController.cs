@@ -1,7 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using VacationRental.Api.Models;
+using VacationRental.Infrastructure.Entities;
+using VacationRental.Infrastructure.Exceptions;
+using VacationRental.Logic.DTOs;
+using VacationRental.Logic.Interfaces;
 
 namespace VacationRental.Api.Controllers
 {
@@ -9,64 +12,43 @@ namespace VacationRental.Api.Controllers
     [ApiController]
     public class BookingsController : ControllerBase
     {
-        private readonly IDictionary<int, RentalViewModel> _rentals;
-        private readonly IDictionary<int, BookingViewModel> _bookings;
+        private readonly IBookingLogic _bookingLogic;
 
-        public BookingsController(
-            IDictionary<int, RentalViewModel> rentals,
-            IDictionary<int, BookingViewModel> bookings)
+        public BookingsController(IBookingLogic bookingLogic)
         {
-            _rentals = rentals;
-            _bookings = bookings;
+            _bookingLogic = bookingLogic;
         }
 
         [HttpGet]
         [Route("{bookingId:int}")]
-        public BookingViewModel Get(int bookingId)
+        public async Task<BookingViewModel> Get(int bookingId, CancellationToken ct)
         {
-            if (!_bookings.ContainsKey(bookingId))
-                throw new ApplicationException("Booking not found");
-
-            return _bookings[bookingId];
+            var config = new TypeAdapterConfig();
+            config.NewConfig<DateOnly, DateTime>().MapWith(src => new DateTime(src.Year, src.Month, src.Day));
+            
+            var bookingItem = await _bookingLogic.GetBookingAsync(bookingId, ct);
+            return bookingItem.Adapt<BookingViewModel>(config);
         }
 
         [HttpPost]
-        public ResourceIdViewModel Post(BookingBindingModel model)
+        public async Task<ResourceIdViewModel> Post(BookingBindingModel model, CancellationToken ct)
         {
-            if (model.Nights <= 0)
-                throw new ApplicationException("Nigts must be positive");
-            if (!_rentals.ContainsKey(model.RentalId))
-                throw new ApplicationException("Rental not found");
+            var config = new TypeAdapterConfig();
+            config.NewConfig<DateTime,DateOnly>() .MapWith(src => new DateOnly(src.Year, src.Month, src.Day));
 
-            for (var i = 0; i < model.Nights; i++)
+            try
             {
-                var count = 0;
-                foreach (var booking in _bookings.Values)
-                {
-                    if (booking.RentalId == model.RentalId
-                        && (booking.Start <= model.Start.Date && booking.Start.AddDays(booking.Nights) > model.Start.Date)
-                        || (booking.Start < model.Start.AddDays(model.Nights) && booking.Start.AddDays(booking.Nights) >= model.Start.AddDays(model.Nights))
-                        || (booking.Start > model.Start && booking.Start.AddDays(booking.Nights) < model.Start.AddDays(model.Nights)))
-                    {
-                        count++;
-                    }
-                }
-                if (count >= _rentals[model.RentalId].Units)
-                    throw new ApplicationException("Not available");
+
+                var addedBookingId = await _bookingLogic.AddBookingAsync(model.Adapt<BookingCreationDto>(config), ct);
+
+                var result = new ResourceIdViewModel { Id = addedBookingId };
+                return result;
             }
-
-
-            var key = new ResourceIdViewModel { Id = _bookings.Keys.Count + 1 };
-
-            _bookings.Add(key.Id, new BookingViewModel
+            catch (NotAvailableForBookingException ex)
             {
-                Id = key.Id,
-                Nights = model.Nights,
-                RentalId = model.RentalId,
-                Start = model.Start.Date
-            });
 
-            return key;
+                throw new ApplicationException("Not Available For Booking");
+            }
         }
     }
 }

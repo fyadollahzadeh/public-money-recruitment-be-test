@@ -1,0 +1,13 @@
+﻿using VacationRental.Infrastructure.Entities;
+using VacationRental.Logic.DTOs;
+
+namespace VacationRental.Logic.Interfaces
+{
+    public interface IRentalLogic
+    {
+        Task<int> AddRentalAsync(RentalCreationDto model, CancellationToken ct);
+        Task<RentalEntity> GetRentalAsync(int rentalId, CancellationToken ct);
+
+        Task<RentalEntity> UpdateRentalAsync(RentalUpdateDto rentalEntity, CancellationToken none);
+    }
+}

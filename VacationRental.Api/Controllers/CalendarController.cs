@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using VacationRental.Api.Models;
+using VacationRental.Infrastructure.Exceptions;
+using VacationRental.Logic.DTOs;
+using VacationRental.Logic.Interfaces;
 
 namespace VacationRental.Api.Controllers
 {
@@ -9,51 +13,30 @@ namespace VacationRental.Api.Controllers
     [ApiController]
     public class CalendarController : ControllerBase
     {
-        private readonly IDictionary<int, RentalViewModel> _rentals;
-        private readonly IDictionary<int, BookingViewModel> _bookings;
+        private readonly ICalendarLogic _calendarLogic;
 
-        public CalendarController(
-            IDictionary<int, RentalViewModel> rentals,
-            IDictionary<int, BookingViewModel> bookings)
+        public CalendarController(ICalendarLogic calendarLogic)
         {
-            _rentals = rentals;
-            _bookings = bookings;
+            _calendarLogic = calendarLogic;
         }
 
         [HttpGet]
-        public CalendarViewModel Get(int rentalId, DateTime start, int nights)
+        public async Task<CalendarViewModel> Get([FromQuery] CalendarBookingRequestModel requestDto,CancellationToken ct)
         {
-            if (nights < 0)
-                throw new ApplicationException("Nights must be positive");
-            if (!_rentals.ContainsKey(rentalId))
-                throw new ApplicationException("Rental not found");
-
-            var result = new CalendarViewModel 
+            try
             {
-                RentalId = rentalId,
-                Dates = new List<CalendarDateViewModel>() 
-            };
-            for (var i = 0; i < nights; i++)
-            {
-                var date = new CalendarDateViewModel
-                {
-                    Date = start.Date.AddDays(i),
-                    Bookings = new List<CalendarBookingViewModel>()
-                };
-
-                foreach (var booking in _bookings.Values)
-                {
-                    if (booking.RentalId == rentalId
-                        && booking.Start <= date.Date && booking.Start.AddDays(booking.Nights) > date.Date)
-                    {
-                        date.Bookings.Add(new CalendarBookingViewModel { Id = booking.Id });
-                    }
-                }
-
-                result.Dates.Add(date);
+                var config = new TypeAdapterConfig();
+                config.NewConfig<DateTime, DateOnly>().MapWith(src => new DateOnly(src.Year, src.Month, src.Day));
+                config.NewConfig<DateOnly, DateTime>().MapWith(src => new DateTime(src.Year, src.Month, src.Day));
+                var callendarBookingDto = requestDto.Adapt<CalendarBookingRequestDto>(config);
+                var calendarDto = await _calendarLogic.GetCalendarBookings(callendarBookingDto, ct);
+                return calendarDto.Adapt<CalendarViewModel>(config);
             }
-
-            return result;
+            catch (RentalNotFoundException ex)
+            {
+                throw new ApplicationException("Rental not found");
+            }
         }
     }
+
 }
