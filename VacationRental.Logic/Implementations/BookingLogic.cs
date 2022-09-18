@@ -31,7 +31,7 @@ namespace VacationRental.Logic.Implementations
             var model = bookingEntity.Adapt<BookingEntity>();
             Func<BookingEntity, bool> findOverlappingBookingsOfRentalQuery = booking => booking.RentalId == bookingEntity.RentalId && DoesBookingsOverlap(model, booking, rental.PreparationTimeInDays);
             IEnumerable<BookingEntity> overlappingBookings = await _bookingDatabaseRepository.GetAllAsync(findOverlappingBookingsOfRentalQuery, ct);
-            if (overlappingBookings.Count() >= rental.Units)
+            if (overlappingBookings is not null && overlappingBookings.Count() >= rental.Units)
                 throw new NotAvailableForBookingException("Not available");
 
 

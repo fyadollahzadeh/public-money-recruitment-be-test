@@ -100,6 +100,28 @@ namespace VacationRental.Logic.Tests
             await action.Should().ThrowAsync<NotAvailableForBookingException>();
         }
 
+        [Fact]
+        public async void AddBooking_NoPreparationDays_HasOverlap_OfType_StartsBeforeEndsBefore_ShouldThrowException()
+        {
+            //Arrange
+            var existingFakeBookings = new List<BookingEntity>()
+            {
+                new BookingEntity
+                {
+                    RentalId = 1,
+                    Start = new DateOnly(2002, 1, 2),
+                    Nights = 2
+                }
+            };
+            var givenData = new BookingCreationDto { RentalId = 1, Nights = 2, Start = new DateOnly(2002, 1, 1) };
+            IBookingLogic bookingLogic = GetBookingLogic(fakeRentalsInDatabase: new List<RentalEntity> { new RentalEntity(1) { Units = 1, PreparationTimeInDays = 0 } }, fakeBookingsInDatabse: existingFakeBookings);
+
+            //Act
+            var action = async () => await bookingLogic.AddBookingAsync(givenData, CancellationToken.None);
+
+            //Assert
+            await action.Should().ThrowAsync<NotAvailableForBookingException>();
+        }
         private IBookingLogic GetBookingLogic(List<RentalEntity>? fakeRentalsInDatabase=null,List<BookingEntity>? fakeBookingsInDatabse = null)
         {
 
@@ -115,7 +137,7 @@ namespace VacationRental.Logic.Tests
                 .ReturnsAsync((int id, CancellationToken ct) => fakeBookingsInDatabse?.FirstOrDefault(X => X.Id == id));
             stubBookingRepository
                 .Setup(x => x.GetAllAsync(It.IsAny<Func<BookingEntity, bool>>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((Func<BookingEntity, bool> func, CancellationToken ct) => fakeBookingsInDatabse.Where(func));
+                .ReturnsAsync((Func<BookingEntity, bool> func, CancellationToken ct) => fakeBookingsInDatabse?.Where(func));
             stubBookingRepository.Setup(x => x.AddAsync(It.IsAny<BookingEntity>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(1);
             var bookingLogic = new BookingLogic(stubBookingRepository.Object,stubRentalRepository.Object);
