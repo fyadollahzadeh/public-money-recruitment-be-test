@@ -10,24 +10,33 @@ namespace VacationRental.Infrastructure.Repositories.Implementations
 {
     public class RentalDatabaseRepository : IRentalDatabaseRepository
     {
+        Dictionary<int, RentalEntity> _rentals;
+        public RentalDatabaseRepository(IDictionary<int, RentalEntity> rentals)
+        {
+            _rentals = (Dictionary<int, RentalEntity>?)rentals;
+        }
         public Task<int> AddAsync(RentalEntity item, CancellationToken ct)
         {
-            throw new NotImplementedException();
+            var itemId = _rentals.Keys.Count + 1;
+            item.Id = itemId;
+            _rentals.Add(itemId, item);
+            return Task.FromResult(itemId);
         }
 
-        public Task<IEnumerable<RentalEntity>> GetAllAsync(Func<RentalEntity, bool> searchQuery, CancellationToken ct)
+        public async Task<IEnumerable<RentalEntity>> GetAllAsync(Func<RentalEntity, bool> searchQuery, CancellationToken ct)
         {
-            throw new NotImplementedException();
+            return _rentals.Values.Where(searchQuery);
         }
 
-        public Task<RentalEntity> GetAsync(int itemId, CancellationToken ct)
+        public async Task<RentalEntity> GetAsync(int itemId, CancellationToken ct)
         {
-            throw new NotImplementedException();
+            return _rentals.GetValueOrDefault(itemId);
         }
 
-        public Task<RentalEntity> UpdateAsync(RentalEntity item, CancellationToken ct)
+        public async Task<RentalEntity> UpdateAsync(RentalEntity item, CancellationToken ct)
         {
-            throw new NotImplementedException();
+            _rentals[item.Id] = item;
+            return _rentals[item.Id];
         }
     }
 }

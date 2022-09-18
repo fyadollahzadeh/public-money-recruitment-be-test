@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using VacationRental.Api.Models;
+using VacationRental.Logic.Interfaces;
 
 namespace VacationRental.Api.Controllers
 {
@@ -9,35 +9,30 @@ namespace VacationRental.Api.Controllers
     [ApiController]
     public class RentalsController : ControllerBase
     {
-        private readonly IDictionary<int, RentalViewModel> _rentals;
-
-        public RentalsController(IDictionary<int, RentalViewModel> rentals)
+        private readonly IRentalLogic _rentalLogic;
+        public RentalsController(IRentalLogic rentalLogic)
         {
-            _rentals = rentals;
+            _rentalLogic = rentalLogic;
         }
 
         [HttpGet]
         [Route("{rentalId:int}")]
-        public RentalViewModel Get(int rentalId)
+        public async Task<RentalViewModel> Get(int rentalId, CancellationToken ct)
         {
-            if (!_rentals.ContainsKey(rentalId))
-                throw new ApplicationException("Rental not found");
-
-            return _rentals[rentalId];
+            var rentalEntity = await _rentalLogic.GetRentalAsync(rentalId, ct);
+            return rentalEntity.Adapt<RentalViewModel>();
         }
 
         [HttpPost]
-        public ResourceIdViewModel Post(RentalBindingModel model)
+        public async Task<RentalViewModel> Post(RentalBindingModel model, CancellationToken ct)
         {
-            var key = new ResourceIdViewModel { Id = _rentals.Keys.Count + 1 };
+            var addedItem = await _rentalLogic.AddRentalAsync(model.Adapt<Logic.DTOs.RentalCreationDto>(), ct);
 
-            _rentals.Add(key.Id, new RentalViewModel
+            return new RentalViewModel
             {
-                Id = key.Id,
+                Id = addedItem,
                 Units = model.Units
-            });
-
-            return key;
+            };
         }
     }
 }

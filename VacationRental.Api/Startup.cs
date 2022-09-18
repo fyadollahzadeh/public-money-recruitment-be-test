@@ -6,6 +6,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
 using VacationRental.Api.Models;
+using VacationRental.Infrastructure.Entities;
+using VacationRental.Infrastructure.Repositories.Implementations;
+using VacationRental.Infrastructure.Repositories.Interfaces;
+using VacationRental.Logic.Implementations;
+using VacationRental.Logic.Interfaces;
 
 namespace VacationRental.Api
 {
@@ -24,9 +29,8 @@ namespace VacationRental.Api
             services.AddMvc();
 
             services.AddSwaggerGen(opts => opts.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Vacation rental information", Version = "v1" }));
-
-            services.AddSingleton<IDictionary<int, RentalViewModel>>(new Dictionary<int, RentalViewModel>());
-            services.AddSingleton<IDictionary<int, BookingViewModel>>(new Dictionary<int, BookingViewModel>());
+            services.AddDatabaseServices();
+            services.AddLogicServices();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,6 +49,26 @@ namespace VacationRental.Api
             app.UseRouting();
 
             app.UseEndpoints(conf => conf.MapControllers());
+        }
+    }
+
+
+    public static class StartupConfig
+    {
+        public static IServiceCollection AddDatabaseServices(this IServiceCollection services)
+        {
+            services.AddSingleton<IDictionary<int, RentalEntity>>(new Dictionary<int, RentalEntity>());
+            services.AddSingleton<IDictionary<int, BookingViewModel>>(new Dictionary<int, BookingViewModel>());
+            services.AddSingleton<IRentalDatabaseRepository, RentalDatabaseRepository>();
+            services.AddSingleton<IBookingDatabaseRepository, BookingDatabaseRepository>();
+            return services;
+        }
+        public static IServiceCollection AddLogicServices(this IServiceCollection services)
+        {
+            services.AddSingleton<IRentalLogic, RentalLogic>();
+            services.AddSingleton<IBookingLogic, BookingLogic>();
+            services.AddSingleton<ICalendarLogic, CalendarLogic>();
+            return services;
         }
     }
 }
