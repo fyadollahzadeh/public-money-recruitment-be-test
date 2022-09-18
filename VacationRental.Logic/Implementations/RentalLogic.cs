@@ -30,8 +30,10 @@ namespace VacationRental.Logic.Implementations
             return item;
         }
 
-        public async Task<int> UpdateRentalAsync(RentalEntity rentalEntity, CancellationToken ct)
+        public async Task<int> UpdateRentalAsync(RentalUpdateDto rentalUpdateDto, CancellationToken ct)
         {
+            var rentalEntity = await GetRentalAsync(rentalUpdateDto.Id,ct);
+
             var doesOverlap = await doesOverlapHappens();
             if (doesOverlap) throw new NotUpdatableException("can not update, due to existing bookings");
 
@@ -43,9 +45,9 @@ namespace VacationRental.Logic.Implementations
                 var bookingsOfRental = await _bookingDatabaseRepository.GetAllAsync(x => x.RentalId == rentalEntity.Id, ct);
                 foreach (var booking in bookingsOfRental)
                 {
-                    var overlappingBookings = await _bookingDatabaseRepository.GetAllAsync(otherBooking => otherBooking.Id != booking.Id && otherBooking.RentalId == booking.RentalId && booking.EndDate.AddDays(rentalEntity.PreparationTimeInDays) > otherBooking.Start, ct);
+                    var overlappingBookings = await _bookingDatabaseRepository.GetAllAsync(otherBooking => otherBooking.Id != booking.Id && otherBooking.RentalId == booking.RentalId && booking.EndDate.AddDays(rentalUpdateDto.PreparationTimeInDays) > otherBooking.Start, ct);
                     int overlapCounts = overlappingBookings.Count();
-                    if (overlapCounts >= rentalEntity.Units)
+                    if (overlapCounts >= rentalUpdateDto.Units)
                     {
                         return true;
                     }

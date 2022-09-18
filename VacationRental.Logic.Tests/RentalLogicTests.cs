@@ -68,6 +68,7 @@ namespace VacationRental.Logic.Tests
         {
             //Arrange
 
+            var fakeRentalsInDatabse = new List<RentalEntity> { new RentalEntity(1) { Units = 1, PreparationTimeInDays = 1 } };
             var fakeBookingsInDatabse = new List<BookingEntity>()
             {
 
@@ -86,10 +87,10 @@ namespace VacationRental.Logic.Tests
                     Nights = 3
                 }
             };
-            IRentalLogic rentalLogic = GetRentalLogic(fakeBookingsInDatabse : fakeBookingsInDatabse);
+            IRentalLogic rentalLogic = GetRentalLogic(fakeRentalsInDatabse, fakeBookingsInDatabse : fakeBookingsInDatabse);
 
             //Act
-            var action = async () => await rentalLogic.UpdateRentalAsync(new RentalEntity { Id = 1, PreparationTimeInDays = 2, Units = 1 }, CancellationToken.None);
+            var action = async () => await rentalLogic.UpdateRentalAsync(new RentalUpdateDto { Id = 1, PreparationTimeInDays = 2, Units = 1 }, CancellationToken.None);
 
             //Assert
             await action.Should().ThrowAsync<NotUpdatableException>();
@@ -101,6 +102,7 @@ namespace VacationRental.Logic.Tests
         {
             //Arrange
 
+            var fakeRentalsInDatabse = new List<RentalEntity> { new RentalEntity(1) { Units = 2, PreparationTimeInDays = 1 } };
             var fakeBookingsInDatabse = new List<BookingEntity>()
             {
 
@@ -108,7 +110,7 @@ namespace VacationRental.Logic.Tests
                 {
                     Id = 1,
                     RentalId = 1,
-                    Start = new DateOnly(2002, 1, 1),
+                    Start = new DateOnly(2002, 1, 3),
                     Nights = 1
                 },
                 new BookingEntity
@@ -119,13 +121,29 @@ namespace VacationRental.Logic.Tests
                     Nights = 3
                 }
             };
-            IRentalLogic rentalLogic = GetRentalLogic(fakeBookingsInDatabse: fakeBookingsInDatabse);
+            IRentalLogic rentalLogic = GetRentalLogic(fakeRentalsInDatabse, fakeBookingsInDatabse: fakeBookingsInDatabse);
 
             //Act
-            var action = async () => await rentalLogic.UpdateRentalAsync(new RentalEntity { Id = 1, PreparationTimeInDays = 1, Units = 1 }, CancellationToken.None);
+            var action = async () => await rentalLogic.UpdateRentalAsync(new RentalUpdateDto { Id = 1, PreparationTimeInDays = 1, Units = 1 }, CancellationToken.None);
 
             //Assert
             await action.Should().ThrowAsync<NotUpdatableException>();
+
+        }
+
+        [Fact]
+        public async void UpdateRental_NotExistingRental_ShouldThrowException()
+        {
+            //Arrange
+
+            var fakeRentalsInDatabse = new List<RentalEntity> { new RentalEntity(1) { Units = 2, PreparationTimeInDays = 1 } };
+            IRentalLogic rentalLogic = GetRentalLogic(fakeRentalsInDatabse);
+
+            //Act
+            var action = async () => await rentalLogic.UpdateRentalAsync(new RentalUpdateDto { Id = 2, PreparationTimeInDays = 1, Units = 1 }, CancellationToken.None);
+
+            //Assert
+            await action.Should().ThrowAsync<EntityNotFoundException>();
 
         }
 
@@ -134,6 +152,7 @@ namespace VacationRental.Logic.Tests
         {
             //Arrange
 
+            var fakeRentalsInDatabse = new List<RentalEntity> { new RentalEntity(1) { Units = 1, PreparationTimeInDays = 1 } };
             var fakeBookingsInDatabse = new List<BookingEntity>()
             {
 
@@ -152,10 +171,10 @@ namespace VacationRental.Logic.Tests
                     Nights = 3
                 }
             };
-            IRentalLogic rentalLogic = GetRentalLogic(fakeBookingsInDatabse: fakeBookingsInDatabse);
+            IRentalLogic rentalLogic = GetRentalLogic(fakeRentalsInDatabse,fakeBookingsInDatabse: fakeBookingsInDatabse);
 
             //Act
-            var updatedItemId = await rentalLogic.UpdateRentalAsync(new RentalEntity { Id = 1, PreparationTimeInDays = 1, Units = 3 }, CancellationToken.None);
+            var updatedItemId = await rentalLogic.UpdateRentalAsync(new RentalUpdateDto { Id = 1, PreparationTimeInDays = 1, Units = 3 }, CancellationToken.None);
 
             //Assert
             updatedItemId.Should().Be(1);
