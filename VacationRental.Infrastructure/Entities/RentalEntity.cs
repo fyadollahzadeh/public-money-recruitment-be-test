@@ -8,6 +8,10 @@ namespace VacationRental.Infrastructure.Entities
 {
     public class RentalEntity : BaseEntity<int>
     {
+        public RentalEntity() : base(0)
+        {
+
+        }
         public RentalEntity(int key) : base(key)
         {
         }

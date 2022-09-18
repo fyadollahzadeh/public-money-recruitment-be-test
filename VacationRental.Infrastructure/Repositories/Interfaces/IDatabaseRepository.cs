@@ -9,6 +9,7 @@ namespace VacationRental.Infrastructure.Repositories.Interfaces
 {
     public interface IDatabaseRepository<T, TKey> where T : BaseEntity<TKey>
     {
+        Task<int> AddAsync(T item, CancellationToken ct);
         Task<T> GetAsync(TKey itemId, CancellationToken ct);
     }
 }

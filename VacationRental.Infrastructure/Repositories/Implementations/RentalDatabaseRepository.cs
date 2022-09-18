@@ -10,6 +10,11 @@ namespace VacationRental.Infrastructure.Repositories.Implementations
 {
     public class RentalDatabaseRepository : IRentalDatabaseRepository
     {
+        public Task<int> AddAsync(RentalEntity item, CancellationToken ct)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<RentalEntity> GetAsync(int itemId, CancellationToken ct)
         {
             throw new NotImplementedException();

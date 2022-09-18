@@ -1,4 +1,5 @@
-﻿using VacationRental.Infrastructure.Entities;
+﻿using Mapster;
+using VacationRental.Infrastructure.Entities;
 using VacationRental.Infrastructure.Exceptions;
 using VacationRental.Infrastructure.Repositories.Interfaces;
 using VacationRental.Logic.DTOs;
@@ -13,9 +14,10 @@ namespace VacationRental.Logic.Implementations
         {
             _rentalDatabaseRepository = rentalDatabaseRepository;
         }
-        public Task<int> AddRentalAsync(RentalCreationDto model, CancellationToken ct)
+        public async Task<int> AddRentalAsync(RentalCreationDto model, CancellationToken ct)
         {
-            throw new NotImplementedException();
+            var addedRentalId = await _rentalDatabaseRepository.AddAsync(model.Adapt<RentalEntity>(),ct);
+            return addedRentalId;
         }
 
         public async Task<RentalEntity> GetRentalAsync(int rentalId, CancellationToken ct)
