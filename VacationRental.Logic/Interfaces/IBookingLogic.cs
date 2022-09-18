@@ -8,5 +8,6 @@ namespace VacationRental.Logic.Interfaces
         Task<BookingEntity> GetBookingAsync(int bookingId, CancellationToken ct);
         Task<int> AddBookingAsync(BookingCreationDto bookingEntity, CancellationToken ct);
         Task<IEnumerable<BookingEntity>> GetBookingsOfRentalOccupiedOnDate(int rentalId, DateOnly startDate, CancellationToken ct);
+        Task<List<PreparationTime>> GetUnitsOfRentalNeedsPreparationOnDate(int rentalId, DateOnly dateOnly, CancellationToken none);
     }
 }

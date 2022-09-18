@@ -3,8 +3,6 @@
     public class BookingEntity : BaseEntity<int>
     {
         public int RentalId { get; set; }
-
-        private DateTime _startIgnoreTime;
         public BookingEntity() : base(0)
         {
 

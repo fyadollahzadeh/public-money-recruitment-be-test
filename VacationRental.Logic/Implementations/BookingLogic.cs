@@ -53,10 +53,19 @@ namespace VacationRental.Logic.Implementations
             return item;
         }
 
-        public async Task<IEnumerable<BookingEntity>> GetBookingsOfRentalOccupiedOnDate(int rentalId, DateOnly dateTime, CancellationToken ct)
+        public async Task<IEnumerable<BookingEntity>> GetBookingsOfRentalOccupiedOnDate(int rentalId, DateOnly date, CancellationToken ct)
         {
-            var items = await _bookingDatabaseRepository.GetAllAsync(booking => booking.RentalId == rentalId && booking.Start <= dateTime && booking.EndDate > dateTime, ct);
+            var items = await _bookingDatabaseRepository.GetAllAsync(booking => booking.RentalId == rentalId && booking.Start <= date && booking.EndDate > date, ct);
             return items;
+        }
+
+        public async Task<List<PreparationTime>> GetUnitsOfRentalNeedsPreparationOnDate(int rentalId, DateOnly date, CancellationToken ct)
+        {
+            var rental = await _rentalDatabaseRepository.GetAsync(rentalId, ct);
+            if (rental == null) throw new RentalNotFoundException("Rental not found");
+
+            var unitsThatNeedPreparationOnThisDate = await _bookingDatabaseRepository.GetAllAsync(booking => booking.RentalId == rentalId && booking.EndDate <= date && booking.EndDate.AddDays(rental.PreparationTimeInDays) > date, ct);
+            return unitsThatNeedPreparationOnThisDate.Select(x => new PreparationTime { Unit = x.Id }).ToList();
         }
     }
 }

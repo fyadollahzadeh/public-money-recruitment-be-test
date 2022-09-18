@@ -281,6 +281,51 @@ namespace VacationRental.Logic.Tests
             //Assert
             bookings.Should().BeEquivalentTo(existingFakeBookings);
         }
+
+
+
+        [Fact]
+        public async void GetBookingsOccupiedOnDate_ThereAre2UnitsThatNeedPreparation_ShouldReturn2PreparationItems()
+        {
+            //Arrange
+
+            var existingFakeBookings = new List<BookingEntity>()
+            {
+
+                new BookingEntity
+                {
+                    Id = 1,
+                    RentalId = 1,
+                    Start = new DateOnly(2002, 1, 3),
+                    Nights = 1
+                },
+                new BookingEntity
+                {
+                    Id = 2,
+                    RentalId = 1,
+                    Start = new DateOnly(2002, 1, 1),
+                    Nights = 3
+                },
+                new BookingEntity
+                {
+                    Id = 3,
+                    RentalId = 1,
+                    Start = new DateOnly(2002, 1, 1),
+                    Nights = 1
+                }
+            };
+            var bookingLogic = GetBookingLogic(
+                fakeBookingsInDatabse: existingFakeBookings,
+                fakeRentalsInDatabase: new List<RentalEntity> { new RentalEntity(1) { Units = 2, PreparationTimeInDays = 3 } });
+            var expectedResult = new List<PreparationTime>() { new PreparationTime { Unit = 1 }, new PreparationTime { Unit = 2 } };
+
+            //Act
+            List<PreparationTime> preparationTimes = await bookingLogic.GetUnitsOfRentalNeedsPreparationOnDate(1, new DateOnly(2002, 1, 5), CancellationToken.None);
+
+            //Assert
+            preparationTimes.Should().BeEquivalentTo(expectedResult);
+        }
+
         private IBookingLogic GetBookingLogic(List<RentalEntity>? fakeRentalsInDatabase=null,List<BookingEntity>? fakeBookingsInDatabse = null)
         {
 
