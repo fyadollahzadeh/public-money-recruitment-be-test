@@ -11,9 +11,9 @@ namespace VacationRental.Logic.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<RentalEntity> GetRentalAsync(int rentalId, CancellationToken ct)
+        public async Task<RentalEntity> GetRentalAsync(int rentalId, CancellationToken ct)
         {
-            throw new NotImplementedException();
+            return new RentalEntity(rentalId) { Units = 1 };
         }
     }
 }
