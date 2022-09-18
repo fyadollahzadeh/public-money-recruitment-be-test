@@ -14,14 +14,19 @@ namespace VacationRental.Logic.Implementations
 {
     public class BookingLogic : IBookingLogic
     {
-        IBookingDatabaseRepository _bookingDatabaseRepository;
-        public BookingLogic(IBookingDatabaseRepository bookingDatabaseRepository)
+        private readonly IBookingDatabaseRepository _bookingDatabaseRepository;
+        private readonly IRentalDatabaseRepository _rentalDatabaseRepository;
+        public BookingLogic(IBookingDatabaseRepository bookingDatabaseRepository,IRentalDatabaseRepository rentalDatabaseRepository)
         {
             _bookingDatabaseRepository = bookingDatabaseRepository;
+            _rentalDatabaseRepository = rentalDatabaseRepository;
         }
 
         public async Task<int> AddBookingAsync(BookingCreationDto bookingEntity, CancellationToken ct)
         {
+            var rental = await _rentalDatabaseRepository.GetAsync(bookingEntity.RentalId, ct);
+            if (rental == null) throw new RentalNotFoundException();
+
             var addedItemId = await _bookingDatabaseRepository.AddAsync(bookingEntity.Adapt<BookingEntity>(),ct);
             return addedItemId;
         }

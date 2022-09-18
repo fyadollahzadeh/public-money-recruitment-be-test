@@ -23,7 +23,7 @@ namespace VacationRental.Logic.Tests
         {
             //Arrange
             var givenData = new BookingEntity { Id = 1, RentalId = 1, Nights = 1, Start = new DateOnly(2002, 1, 1) };
-            IBookingLogic bookingLogic = GetBookingLogic(new List<BookingEntity> { givenData });
+            IBookingLogic bookingLogic = GetBookingLogic(fakeBookingsInDatabse : new List<BookingEntity> { givenData });
 
             //Act
             var bookingEntity = await bookingLogic.GetBookingAsync(1, CancellationToken.None);
@@ -37,7 +37,7 @@ namespace VacationRental.Logic.Tests
         {
             //Arrange
             var givenData = new BookingEntity { Id = 1, RentalId = 1, Nights = 1, Start = new DateOnly(2002, 1, 1) };
-            IBookingLogic bookingLogic = GetBookingLogic(new List<BookingEntity> { givenData });
+            IBookingLogic bookingLogic = GetBookingLogic(fakeBookingsInDatabse : new List<BookingEntity> { givenData });
 
             //Act
             var action =async ()=> await bookingLogic.GetBookingAsync(2, CancellationToken.None);
@@ -61,14 +61,36 @@ namespace VacationRental.Logic.Tests
 
         }
 
-        private IBookingLogic GetBookingLogic(List<BookingEntity>? fakeBookingsInDatabse = null)
+        [Fact]
+        public async void AddBooking_NotExistingRental_ShouldThrowException()
         {
+            //Arrange
+            var givenData = new BookingCreationDto { RentalId = 2, Nights = 1, Start = new DateOnly(2002, 1, 1) };
+            IBookingLogic bookingLogic = GetBookingLogic(fakeRentalsInDatabase: new List<RentalEntity> { new RentalEntity(1) { Units = 1, PreparationTimeInDays = 1 } });
+
+            //Act
+            var action = async () => await bookingLogic.AddBookingAsync(givenData, CancellationToken.None);
+
+            //Assert
+            await action.Should().ThrowAsync<RentalNotFoundException>();
+
+        }
+
+        private IBookingLogic GetBookingLogic(List<RentalEntity>? fakeRentalsInDatabase=null,List<BookingEntity>? fakeBookingsInDatabse = null)
+        {
+
+            var stubRentalRepository = new Mock<IRentalDatabaseRepository>();
+            stubRentalRepository.Setup(x => x.GetAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((int id, CancellationToken ct) => fakeRentalsInDatabase?.FirstOrDefault(X => X.Id == id));
+            stubRentalRepository.Setup(x => x.AddAsync(It.IsAny<RentalEntity>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(1);
+
             var stubBookingRepository = new Mock<IBookingDatabaseRepository>();
             stubBookingRepository.Setup(x => x.GetAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((int id, CancellationToken ct) => fakeBookingsInDatabse?.FirstOrDefault(X => X.Id == id));
             stubBookingRepository.Setup(x => x.AddAsync(It.IsAny<BookingEntity>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(1);
-            var bookingLogic = new BookingLogic(stubBookingRepository.Object);
+            var bookingLogic = new BookingLogic(stubBookingRepository.Object,stubRentalRepository.Object);
 
             return bookingLogic;
         }
