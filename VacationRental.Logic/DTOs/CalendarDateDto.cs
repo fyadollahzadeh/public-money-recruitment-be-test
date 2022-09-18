@@ -2,7 +2,7 @@
 {
     public class CalendarDateDto
     {
-        public DateTime Date { get; set; }
+        public DateOnly Date { get; set; }
         public List<CalendarBookingViewDto> Bookings { get; set; }
         public List<PreparationTime> PreparationTimes { set; get; }
     }

@@ -32,13 +32,19 @@ namespace VacationRental.Logic.Interfaces
             };
             for (var i = 0; i < calendarBookingDto.Nights; i++)
             {
-                var startDate = calendarBookingDto.Start.Date.AddDays(i);
+                var startDate = calendarBookingDto.Start.AddDays(i);
                 var calendarViewModel = new CalendarDateDto
                 {
                     Date = startDate,
                     Bookings = new (),
                     PreparationTimes = new List<PreparationTime>()
                 };
+                IEnumerable<BookingEntity> bookinsOnDate = await _bookingsLogic.GetBookingsOfRentalOccupiedOnDate(rental.Id, startDate, ct);
+                calendarViewModel.Bookings.AddRange(bookinsOnDate.Select(x => new CalendarBookingViewDto
+                {
+                    Id = x.Id,
+                    Unit = x.Id
+                }));
                 result.Dates.Add(calendarViewModel);
             }
 

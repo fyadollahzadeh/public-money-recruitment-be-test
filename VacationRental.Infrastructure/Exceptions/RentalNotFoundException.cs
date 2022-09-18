@@ -2,6 +2,10 @@
 {
     public class RentalNotFoundException : Exception
     {
+        public RentalNotFoundException()
+        {
+        }
+
         public RentalNotFoundException(string? message) : base(message)
         {
         }

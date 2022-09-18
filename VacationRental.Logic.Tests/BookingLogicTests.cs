@@ -248,6 +248,39 @@ namespace VacationRental.Logic.Tests
 
         }
 
+
+
+        [Fact]
+        public async void GetBookingsOccupiedOnDate_ThereAre2UnitsOccupied_ShouldReturn2UnitIds()
+        {
+            //Arrange
+
+            var existingFakeBookings = new List<BookingEntity>()
+            {
+
+                new BookingEntity
+                {
+                    RentalId = 1,
+                    Start = new DateOnly(2002, 1, 3),
+                    Nights = 3
+                },
+                new BookingEntity
+                {
+                    RentalId = 1,
+                    Start = new DateOnly(2002, 1, 5),
+                    Nights = 2
+                }
+            };
+            var bookingLogic = GetBookingLogic(
+                fakeBookingsInDatabse: existingFakeBookings,
+                fakeRentalsInDatabase: new List<RentalEntity> { new RentalEntity(1) { Units = 2, PreparationTimeInDays = 1 } });
+
+            //Act
+            var bookings = await bookingLogic.GetBookingsOfRentalOccupiedOnDate(1, new DateOnly(2002, 1, 5), CancellationToken.None);
+
+            //Assert
+            bookings.Should().BeEquivalentTo(existingFakeBookings);
+        }
         private IBookingLogic GetBookingLogic(List<RentalEntity>? fakeRentalsInDatabase=null,List<BookingEntity>? fakeBookingsInDatabse = null)
         {
 

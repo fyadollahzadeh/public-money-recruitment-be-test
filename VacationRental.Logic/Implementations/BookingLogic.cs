@@ -52,5 +52,11 @@ namespace VacationRental.Logic.Implementations
             if (item == null) throw new EntityNotFoundException();
             return item;
         }
+
+        public async Task<IEnumerable<BookingEntity>> GetBookingsOfRentalOccupiedOnDate(int rentalId, DateOnly dateTime, CancellationToken ct)
+        {
+            var items = await _bookingDatabaseRepository.GetAllAsync(booking => booking.RentalId == rentalId && booking.Start <= dateTime && booking.EndDate > dateTime, ct);
+            return items;
+        }
     }
 }
