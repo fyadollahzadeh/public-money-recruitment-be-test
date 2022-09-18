@@ -25,7 +25,6 @@ namespace VacationRental.Api.Controllers
         {
             var config = new TypeAdapterConfig();
             config.NewConfig<DateOnly, DateTime>().MapWith(src => new DateTime(src.Year, src.Month, src.Day));
-            config.NewConfig<BookingEntity, BookingViewModel>().Map(dest => dest.Start, src => new DateOnly(src.Start.Year, src.Start.Month, src.Start.Day));
             
             var bookingItem = await _bookingLogic.GetBookingAsync(bookingId, ct);
             return bookingItem.Adapt<BookingViewModel>(config);
@@ -36,7 +35,7 @@ namespace VacationRental.Api.Controllers
         {
             var config = new TypeAdapterConfig();
             config.NewConfig<DateTime,DateOnly>() .MapWith(src => new DateOnly(src.Year, src.Month, src.Day));
-            config.NewConfig<BookingBindingModel, BookingCreationDto>() .Map(dest => dest.Start, src => new DateOnly(src.Start.Year, src.Start.Month, src.Start.Day));
+
             try
             {
 
